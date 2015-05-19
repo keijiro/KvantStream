@@ -1,15 +1,14 @@
 ﻿//
-// Streamline - line based particle system.
+// Stream - line particle system.
 //
 
 using UnityEngine;
-using System.Collections;
 
 namespace Kvant {
 
 [ExecuteInEditMode]
-[AddComponentMenu("Kvant/Streamline")]
-public class Streamline : MonoBehaviour
+[AddComponentMenu("Kvant/Stream")]
+public class Stream : MonoBehaviour
 {
     #region Parameters Exposed To Editor
 
@@ -29,10 +28,10 @@ public class Streamline : MonoBehaviour
     [SerializeField] float _noiseSpeed = 0.1f;
     [SerializeField] float _noiseAnimation = 1.0f;
 
+    [ColorUsage(false, true, 0, 8, 0.125f, 3)]
     [SerializeField] Color _color = Color.white;
-    [SerializeField] float _colorAmp = 1.0f;
-    [SerializeField] float _tail = 1.0f;
 
+    [SerializeField] float _tail = 1.0f;
     [SerializeField] int _randomSeed = 0;
     [SerializeField] bool _debug;
 
@@ -54,6 +53,7 @@ public class Streamline : MonoBehaviour
         get { return _emitterPosition; }
         set { _emitterPosition = value; }
     }
+
     public Vector3 emitterSize {
         get { return _emitterSize; }
         set { _emitterSize = value; }
@@ -63,6 +63,7 @@ public class Streamline : MonoBehaviour
         get { return _direction; }
         set { _direction = value; }
     }
+
     public float spread {
         get { return _spread; }
         set { _spread = value; }
@@ -72,6 +73,7 @@ public class Streamline : MonoBehaviour
         get { return _minSpeed; }
         set { _minSpeed = value; }
     }
+
     public float maxSpeed {
         get { return _maxSpeed; }
         set { _maxSpeed = value; }
@@ -81,10 +83,12 @@ public class Streamline : MonoBehaviour
         get { return _noiseFrequency; }
         set { _noiseFrequency = value; }
     }
+
     public float noiseSpeed {
         get { return _noiseSpeed; }
         set { _noiseSpeed = value; }
     }
+
     public float noiseAnimation {
         get { return _noiseAnimation; }
         set { _noiseAnimation = value; }
@@ -94,10 +98,7 @@ public class Streamline : MonoBehaviour
         get { return _color; }
         set { _color = value; }
     }
-    public float colorAmp {
-        get { return _colorAmp; }
-        set { _colorAmp = value; }
-    }
+
     public float tail {
         get { return _tail; }
         set { _tail = value; }
@@ -117,14 +118,14 @@ public class Streamline : MonoBehaviour
 
     #endregion
 
-    #region GPGPU Buffers
+    #region Particle Buffers
 
-    RenderTexture _positionBuffer1;
-    RenderTexture _positionBuffer2;
+    RenderTexture _particleBuffer1;
+    RenderTexture _particleBuffer2;
 
     #endregion
 
-    #region Private Objects
+    #region Private Variables And Objects
 
     Mesh _mesh;
     bool _needsReset = true;
@@ -141,9 +142,7 @@ public class Streamline : MonoBehaviour
     int BufferWidth { get { return 256; } }
 
     int BufferHeight {
-        get {
-            return Mathf.Clamp(_maxParticles / BufferWidth + 1, 1, 127);
-        }
+        get { return Mathf.Clamp(_maxParticles / BufferWidth + 1, 1, 127); }
     }
 
     Material CreateMaterial(Shader shader)
@@ -193,6 +192,7 @@ public class Streamline : MonoBehaviour
 
         // Create a mesh object.
         var mesh = new Mesh();
+        mesh.hideFlags = HideFlags.DontSave;
         mesh.vertices = VA;
         mesh.uv = TA;
         mesh.SetIndices(IA, MeshTopology.Lines, 0);
@@ -200,9 +200,6 @@ public class Streamline : MonoBehaviour
 
         // Avoid being culled.
         mesh.bounds = new Bounds(Vector3.zero, Vector3.one * 1000);
-
-        // This only for temporary use. Don't save.
-        mesh.hideFlags = HideFlags.DontSave;
 
         return mesh;
     }
@@ -238,21 +235,21 @@ public class Streamline : MonoBehaviour
         // Mesh object.
         if (_mesh == null) _mesh = CreateMesh();
 
-        // GPGPU buffers.
-        if (_positionBuffer1) DestroyImmediate(_positionBuffer1);
-        if (_positionBuffer2) DestroyImmediate(_positionBuffer2);
+        // Particle buffers.
+        if (_particleBuffer1) DestroyImmediate(_particleBuffer1);
+        if (_particleBuffer2) DestroyImmediate(_particleBuffer2);
 
-        _positionBuffer1 = CreateBuffer();
-        _positionBuffer2 = CreateBuffer();
+        _particleBuffer1 = CreateBuffer();
+        _particleBuffer2 = CreateBuffer();
 
         // Shader materials.
-        if (!_kernelMaterial) _kernelMaterial = CreateMaterial(_kernelShader );
-        if (!_lineMaterial )  _lineMaterial   = CreateMaterial(_lineShader );
+        if (!_kernelMaterial) _kernelMaterial = CreateMaterial(_kernelShader);
+        if (!_lineMaterial)   _lineMaterial   = CreateMaterial(_lineShader);
         if (!_debugMaterial)  _debugMaterial  = CreateMaterial(_debugShader);
 
         // Initialization.
         ApplyKernelParameters();
-        Graphics.Blit(null, _positionBuffer2, _kernelMaterial, 0);
+        Graphics.Blit(null, _particleBuffer2, _kernelMaterial, 0);
 
         _needsReset = false;
     }
@@ -269,10 +266,10 @@ public class Streamline : MonoBehaviour
     void OnDestroy()
     {
         if (_mesh) DestroyImmediate(_mesh);
-        if (_positionBuffer1) DestroyImmediate(_positionBuffer1);
-        if (_positionBuffer2) DestroyImmediate(_positionBuffer2);
+        if (_particleBuffer1) DestroyImmediate(_particleBuffer1);
+        if (_particleBuffer2) DestroyImmediate(_particleBuffer2);
         if (_kernelMaterial)  DestroyImmediate(_kernelMaterial);
-        if (_lineMaterial )   DestroyImmediate(_lineMaterial);
+        if (_lineMaterial)    DestroyImmediate(_lineMaterial);
         if (_debugMaterial)   DestroyImmediate(_debugMaterial);
     }
 
@@ -284,38 +281,40 @@ public class Streamline : MonoBehaviour
 
         if (Application.isPlaying)
         {
-            // Swap the buffers.
-            var temp = _positionBuffer1;
-            _positionBuffer1 = _positionBuffer2;
-            _positionBuffer2 = temp;
+            // Swap the particle buffers.
+            var temp = _particleBuffer1;
+            _particleBuffer1 = _particleBuffer2;
+            _particleBuffer2 = temp;
 
             // Apply the kernel shader.
-            Graphics.Blit(_positionBuffer1, _positionBuffer2, _kernelMaterial, 1);
+            Graphics.Blit(_particleBuffer1, _particleBuffer2, _kernelMaterial, 1);
         }
         else
         {
             // Editor: initialize the buffer on every update.
-            Graphics.Blit(null, _positionBuffer2, _kernelMaterial, 0);
+            Graphics.Blit(null, _particleBuffer2, _kernelMaterial, 0);
 
-            // Apply the kernel shader.
-            Graphics.Blit(_positionBuffer2, _positionBuffer1, _kernelMaterial, 1);
-            Graphics.Blit(_positionBuffer1, _positionBuffer2, _kernelMaterial, 1);
+            // Apply the kernel shader repeatedly.
+            for (var i = 0; i < 10; i++) {
+                Graphics.Blit(_particleBuffer2, _particleBuffer1, _kernelMaterial, 1);
+                Graphics.Blit(_particleBuffer1, _particleBuffer2, _kernelMaterial, 1);
+            }
         }
 
-        // Draw lines.
-        _lineMaterial.SetTexture("_PositionTex1", _positionBuffer1);
-        _lineMaterial.SetTexture("_PositionTex2", _positionBuffer2);
+        // Draw particles.
+        _lineMaterial.SetTexture("_ParticleTex1", _particleBuffer1);
+        _lineMaterial.SetTexture("_ParticleTex2", _particleBuffer2);
         _lineMaterial.SetColor("_Color", _color);
-        _lineMaterial.SetVector("_Options", new Vector2(_tail, _colorAmp));
+        _lineMaterial.SetFloat("_Tail", _tail);
         Graphics.DrawMesh(_mesh, transform.position, transform.rotation, _lineMaterial, 0);
     }
 
     void OnGUI()
     {
         if (_debug && Event.current.type.Equals(EventType.Repaint)) {
-            if (_debugMaterial && _positionBuffer2) {
+            if (_debugMaterial && _particleBuffer2) {
                 var rect = new Rect(0, 0, 256, 64);
-                Graphics.DrawTexture(rect, _positionBuffer2, _debugMaterial);
+                Graphics.DrawTexture(rect, _particleBuffer2, _debugMaterial);
             }
         }
     }

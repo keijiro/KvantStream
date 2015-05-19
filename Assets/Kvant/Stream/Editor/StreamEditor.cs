@@ -1,5 +1,5 @@
 //
-// Custom editor class for Streamline.
+// Custom editor class for Stream.
 //
 
 using UnityEngine;
@@ -8,8 +8,8 @@ using System.Collections;
 
 namespace Kvant {
 
-[CustomEditor(typeof(Streamline))]
-public class StreamlineEditor : Editor
+[CustomEditor(typeof(Stream))]
+public class StreamEditor : Editor
 {
     SerializedProperty propMaxParticles;
 
@@ -28,7 +28,6 @@ public class StreamlineEditor : Editor
     SerializedProperty propNoiseAnimation;
 
     SerializedProperty propColor;
-    SerializedProperty propColorAmp;
     SerializedProperty propTail;
 
     SerializedProperty propRandomSeed;
@@ -53,7 +52,6 @@ public class StreamlineEditor : Editor
         propNoiseAnimation  = serializedObject.FindProperty("_noiseAnimation");
 
         propColor           = serializedObject.FindProperty("_color");
-        propColorAmp        = serializedObject.FindProperty("_colorAmp");
         propTail            = serializedObject.FindProperty("_tail");
 
         propRandomSeed      = serializedObject.FindProperty("_randomSeed");
@@ -78,15 +76,15 @@ public class StreamlineEditor : Editor
 
     public override void OnInspectorGUI()
     {
-        var targetStreamline = target as Streamline;
+        var targetStream = target as Stream;
         var emptyLabel = new GUIContent();
 
         serializedObject.Update();
 
         EditorGUI.BeginChangeCheck();
         EditorGUILayout.PropertyField(propMaxParticles);
-        EditorGUILayout.HelpBox("Actual Number: " + targetStreamline.maxParticles, MessageType.None);
-        if (EditorGUI.EndChangeCheck()) targetStreamline.NotifyConfigChange();
+        EditorGUILayout.HelpBox("Actual Number: " + targetStream.maxParticles, MessageType.None);
+        if (EditorGUI.EndChangeCheck()) targetStream.NotifyConfigChange();
 
         EditorGUILayout.Space();
 
@@ -112,11 +110,7 @@ public class StreamlineEditor : Editor
         EditorGUILayout.Space();
 
         EditorGUILayout.PropertyField(propColor);
-        EditorGUILayout.Slider(propColorAmp, 1.0f, 20.0f);
         EditorGUILayout.Slider(propTail, 0.0f, 20.0f);
-
-        EditorGUILayout.Space();
-
         EditorGUILayout.PropertyField(propRandomSeed);
         EditorGUILayout.PropertyField(propDebug);
 

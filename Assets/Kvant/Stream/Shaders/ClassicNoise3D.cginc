@@ -1,6 +1,6 @@
-// An HLSL variant of Gustavson's webgl-noise.
+// An HLSL variant of the Gustavson's webgl-noise shader.
 // Translated by Keijiro Takahashi
-// For further details, see the original notice below.
+// For further information, see the original notice below.
 
 //
 // GLSL textureless classic 3D noise "cnoise",

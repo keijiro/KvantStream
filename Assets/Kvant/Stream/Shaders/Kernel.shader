@@ -1,19 +1,21 @@
 ﻿//
-// GPGPU kernels for Streamline.
+// GPGPU kernels for Stream.
 //
-// The texture buffer contains the position (x,y,z) and the life (w).
+// MainTex format:
+// .xyz = particle position
+// .w   = particle life
 //
-Shader "Hidden/Kvant/Streamline/Kernels"
+Shader "Hidden/Kvant/Stream/Kernel"
 {
     Properties
     {
-        _MainTex        ("-", 2D)       = ""{}
-        _EmitterPos     ("-", Vector)   = (0, 0, 20, 0)
-        _EmitterSize    ("-", Vector)   = (40, 40, 40, 0)
-        _Direction      ("-", Vector)   = (0, 0, -1, 0.2)
-        _SpeedParams    ("-", Vector)   = (5, 10, 0, 0)
-        _NoiseParams    ("-", Vector)   = (0.2, 0.1, 1)
-        _Config         ("-", Vector)   = (1, 2, 0, 0)
+        _MainTex     ("-", 2D)     = ""{}
+        _EmitterPos  ("-", Vector) = (0, 0, 20, 0)
+        _EmitterSize ("-", Vector) = (40, 40, 40, 0)
+        _Direction   ("-", Vector) = (0, 0, -1, 0.2)
+        _SpeedParams ("-", Vector) = (5, 10, 0, 0)
+        _NoiseParams ("-", Vector) = (0.2, 0.1, 1)  // (frequency, speed, animation)
+        _Config      ("-", Vector) = (1, 2, 0, 0)   // (throttle, life, random seed, dT)
     }
 
     CGINCLUDE
@@ -29,8 +31,8 @@ Shader "Hidden/Kvant/Streamline/Kernels"
     float3 _EmitterSize;
     float4 _Direction;
     float2 _SpeedParams;
-    float4 _NoiseParams;    // (frequency, speed, animation)
-    float4 _Config;         // (throttle, life, random seed, dT)
+    float4 _NoiseParams;
+    float4 _Config;
 
     // PRNG function.
     float nrand(float2 uv, float salt)
@@ -48,10 +50,10 @@ Shader "Hidden/Kvant/Streamline/Kernels"
         float3 p = float3(nrand(uv, t + 1), nrand(uv, t + 2), nrand(uv, t + 3));
         p = (p - float3(0.5)) * _EmitterSize + _EmitterPos;
 
-        // Life.
+        // Life duration.
         float l = _Config.y * (0.5 + nrand(uv, t + 0));
 
-        // Throttling: discard the particle emission by adding offset.
+        // Throttling: discard particle emission by adding offset.
         float4 offs = float4(1e10, 1e10, 1e10, -1e10) * (uv.x > _Config.x);
 
         return float4(p, l) + offs;
@@ -81,27 +83,21 @@ Shader "Hidden/Kvant/Streamline/Kernels"
         return v;
     }
 
-    // Pass0: initialization
+    // Pass 0: Initialization
     float4 frag_init(v2f_img i) : SV_Target 
     {
         return new_particle(i.uv);
     }
 
-    // Pass1: update
+    // Pass 1: Update
     float4 frag_update(v2f_img i) : SV_Target 
     {
         float4 p = tex2D(_MainTex, i.uv);
-
         if (p.w > 0)
         {
             float dt = _Config.w;
-
-            // Move along the velocity field.
-            p.xyz += get_velocity(p.xyz, i.uv) * dt;
-
-            // Decrement the life.
-            p.w -= dt;
-
+            p.xyz += get_velocity(p.xyz, i.uv) * dt; // position
+            p.w -= dt;                               // life
             return p;
         }
         else
@@ -114,24 +110,20 @@ Shader "Hidden/Kvant/Streamline/Kernels"
 
     SubShader
     {
-        // Pass0: initialization
+        // Pass 0: Initialization
         Pass
         {
-            Fog { Mode off }    
             CGPROGRAM
             #pragma target 3.0
-            #pragma glsl
             #pragma vertex vert_img
             #pragma fragment frag_init
             ENDCG
         }
-        // Pass1: update
+        // Pass 1: Update
         Pass
         {
-            Fog { Mode off }    
             CGPROGRAM
             #pragma target 3.0
-            #pragma glsl
             #pragma vertex vert_img
             #pragma fragment frag_update
             ENDCG

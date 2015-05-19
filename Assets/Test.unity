@@ -14,10 +14,10 @@ SceneSettings:
 RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 6
-  m_Fog: 0
-  m_FogColor: {r: .5, g: .5, b: .5, a: 1}
+  m_Fog: 1
+  m_FogColor: {r: .0627451017, g: .0941176564, b: .145098045, a: 1}
   m_FogMode: 3
-  m_FogDensity: .00999999978
+  m_FogDensity: .0599999987
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
   m_AmbientSkyColor: {r: .211999997, g: .226999998, b: .259000003, a: 1}
@@ -206,21 +206,20 @@ MonoBehaviour:
   _emitterPosition: {x: 0, y: 0, z: 20}
   _emitterSize: {x: 40, y: 40, z: 40}
   _throttle: 1
-  _direction: {x: -0, y: -0, z: -5}
-  _spread: .300000012
-  _minSpeed: 10.2447567
-  _maxSpeed: 18.7412796
-  _noiseFrequency: .213
-  _noiseSpeed: 8.89999962
-  _noiseAnimation: 6.71000004
-  _color: {r: 1, g: 1, b: 1, a: 1}
-  _colorAmp: 1
-  _tail: .800000012
+  _direction: {x: -0, y: -0, z: -1}
+  _spread: .0379999988
+  _minSpeed: 5
+  _maxSpeed: 10
+  _noiseFrequency: .200000003
+  _noiseSpeed: .100000001
+  _noiseAnimation: 1
+  _color: {r: 2.09299994, g: 1.52358079, b: 1.52358079, a: 1}
+  _tail: 1
   _randomSeed: 0
   _debug: 0
   _kernelShader: {fileID: 4800000, guid: 6afe8e4e613e44e00bcbd80b0615a8de, type: 3}
   _lineShader: {fileID: 4800000, guid: 456607e7d289e480eb05f5bc12ad0fe6, type: 3}
-  _debugShader: {fileID: 4800000, guid: 8e25f1b2c1f18429a884abde60e27b2d, type: 3}
+  _debugShader: {fileID: 4800000, guid: 6d079a8b94e4546bd8b1c43b825a8305, type: 3}
 --- !u!4 &1600744610
 Transform:
   m_ObjectHideFlags: 0
@@ -426,12 +425,12 @@ MonoBehaviour:
   tweakMode: 1
   Threshold: .300000012
   MasterAmount: 1
-  MediumAmount: 1
-  LargeAmount: 1
+  MediumAmount: .200000003
+  LargeAmount: .400000006
   Tint: {r: 1, g: 1, b: 1, a: 1}
   KernelSize: 25
   MediumKernelScale: 1
   LargeKernelScale: 5
-  BlendMode: 1
+  BlendMode: 0
   HighQuality: 1
   videoBloomShader: {fileID: 4800000, guid: 4da5120001c1945e99d8db7be2c8c652, type: 3}
