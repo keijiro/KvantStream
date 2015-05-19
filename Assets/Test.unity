@@ -95,6 +95,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 326565778}
+  - 114: {fileID: 326565779}
   m_Layer: 0
   m_Name: Camera Pivot
   m_TagString: Untagged
@@ -108,13 +109,35 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 326565777}
-  m_LocalRotation: {x: 0, y: .42261833, z: 0, w: .906307817}
+  m_LocalRotation: {x: 0, y: .104528472, z: 0, w: .994521916}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 2010005518}
   m_Father: {fileID: 0}
   m_RootOrder: 2
+--- !u!114 &326565779
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 326565777}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f91a6fa75d39940268b68c6204273e22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  position:
+    mode: 0
+    velocity: 1
+    arbitraryVector: {x: 0, y: 1, z: 0}
+    randomness: 0
+  rotation:
+    mode: 2
+    velocity: 30
+    arbitraryVector: {x: 0, y: 1, z: 0}
+    randomness: 0
+  useLocalCoordinate: 1
 --- !u!1 &1113537728
 GameObject:
   m_ObjectHideFlags: 0
@@ -169,7 +192,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1113537728}
-  m_LocalRotation: {x: .408217937, y: -.234569728, z: .109381676, w: .875426054}
+  m_LocalRotation: {x: -3.59673868e-09, y: .999756277, z: -.0220766235, w: -1.6288098e-07}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -204,16 +227,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _maxParticles: 32768
   _emitterPosition: {x: 0, y: 0, z: 20}
-  _emitterSize: {x: 40, y: 40, z: 40}
+  _emitterSize: {x: 50, y: 50, z: 50}
   _throttle: 1
   _direction: {x: -0, y: -0, z: -1}
-  _spread: .0379999988
-  _minSpeed: 5
-  _maxSpeed: 10
-  _noiseFrequency: .200000003
-  _noiseSpeed: .100000001
-  _noiseAnimation: 1
-  _color: {r: 2.09299994, g: 1.52358079, b: 1.52358079, a: 1}
+  _spread: .0309999995
+  _minSpeed: 13.02139
+  _maxSpeed: 26.3101616
+  _noiseFrequency: .104000002
+  _noiseSpeed: 11
+  _noiseAnimation: 2.42000008
+  _color: {r: 1.52358079, g: 1.97518885, b: 2.09299994, a: 1}
   _tail: 1
   _randomSeed: 0
   _debug: 0
@@ -424,7 +447,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tweakMode: 1
   Threshold: .300000012
-  MasterAmount: 1
+  MasterAmount: 2
   MediumAmount: .200000003
   LargeAmount: .400000006
   Tint: {r: 1, g: 1, b: 1, a: 1}

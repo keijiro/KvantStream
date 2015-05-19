@@ -28,7 +28,7 @@ public class Stream : MonoBehaviour
     [SerializeField] float _noiseSpeed = 0.1f;
     [SerializeField] float _noiseAnimation = 1.0f;
 
-    [ColorUsage(false, true, 0, 8, 0.125f, 3)]
+    [ColorUsage(true, true, 0, 8, 0.125f, 3)]
     [SerializeField] Color _color = Color.white;
 
     [SerializeField] float _tail = 1.0f;

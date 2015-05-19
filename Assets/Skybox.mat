@@ -94,15 +94,15 @@ Material:
       data:
         first:
           name: _Exposure
-        second: 1.29999995
+        second: 1
       data:
         first:
           name: _SunSize
-        second: .0399999991
+        second: .0199999996
       data:
         first:
           name: _AtmosphereThickness
-        second: .129999995
+        second: .209999993
       data:
         first:
           name: _Parallax
@@ -155,4 +155,4 @@ Material:
       data:
         first:
           name: _GroundColor
-        second: {r: .104617201, g: .109354481, b: .110294104, a: 1}
+        second: {r: 0, g: 0, b: 0, a: 1}

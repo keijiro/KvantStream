@@ -29,9 +29,14 @@ public class StreamEditor : Editor
 
     SerializedProperty propColor;
     SerializedProperty propTail;
-
     SerializedProperty propRandomSeed;
     SerializedProperty propDebug;
+
+    GUIContent textCenter;
+    GUIContent textSize;
+    GUIContent textDensity;
+    GUIContent textStrength;
+    GUIContent textAnimation;
 
     void OnEnable()
     {
@@ -53,9 +58,14 @@ public class StreamEditor : Editor
 
         propColor           = serializedObject.FindProperty("_color");
         propTail            = serializedObject.FindProperty("_tail");
-
         propRandomSeed      = serializedObject.FindProperty("_randomSeed");
         propDebug           = serializedObject.FindProperty("_debug");
+
+        textCenter    = new GUIContent("Center");
+        textSize      = new GUIContent("Size");
+        textDensity   = new GUIContent("Density");
+        textStrength  = new GUIContent("Strength");
+        textAnimation = new GUIContent("Animation");
     }
 
     void MinMaxSlider(SerializedProperty propMin, SerializedProperty propMax, float minLimit, float maxLimit)
@@ -65,7 +75,7 @@ public class StreamEditor : Editor
 
         EditorGUI.BeginChangeCheck();
 
-        var label = new GUIContent(min.ToString("0.00") + " - " + max.ToString("0.00"));
+        var label = new GUIContent("x(" + min.ToString("0.00") + " - " + max.ToString("0.00") + ")");
         EditorGUILayout.MinMaxSlider(label, ref min, ref max, minLimit, maxLimit);
 
         if (EditorGUI.EndChangeCheck()) {
@@ -77,7 +87,6 @@ public class StreamEditor : Editor
     public override void OnInspectorGUI()
     {
         var targetStream = target as Stream;
-        var emptyLabel = new GUIContent();
 
         serializedObject.Update();
 
@@ -88,24 +97,30 @@ public class StreamEditor : Editor
 
         EditorGUILayout.Space();
 
-        EditorGUILayout.LabelField("Emitter Position / Size / Throttle");
-        EditorGUILayout.PropertyField(propEmitterPosition, emptyLabel);
-        EditorGUILayout.PropertyField(propEmitterSize, emptyLabel);
-        EditorGUILayout.Slider(propThrottle, 0.0f, 1.0f, emptyLabel);
+        EditorGUILayout.LabelField("Emitter");
+        EditorGUI.indentLevel++;
+        EditorGUILayout.PropertyField(propEmitterPosition, textCenter);
+        EditorGUILayout.PropertyField(propEmitterSize, textSize);
+        EditorGUILayout.Slider(propThrottle, 0.0f, 1.0f);
+        EditorGUI.indentLevel--;
 
         EditorGUILayout.Space();
 
-        EditorGUILayout.LabelField("Direction / Speed / Spread");
-        EditorGUILayout.PropertyField(propDirection, emptyLabel);
+        EditorGUILayout.LabelField("Velocity");
+        EditorGUI.indentLevel++;
+        EditorGUILayout.PropertyField(propDirection);
         MinMaxSlider(propMinSpeed, propMaxSpeed, 0.0f, 50.0f);
-        EditorGUILayout.Slider(propSpread, 0.0f, 1.0f, emptyLabel);
+        EditorGUILayout.Slider(propSpread, 0.0f, 1.0f);
+        EditorGUI.indentLevel--;
 
         EditorGUILayout.Space();
 
-        EditorGUILayout.LabelField("Noise Frequency / Speed / Animation");
-        EditorGUILayout.Slider(propNoiseFrequency, 0.01f, 1.0f, emptyLabel);
-        EditorGUILayout.Slider(propNoiseSpeed, 0.0f, 50.0f, emptyLabel);
-        EditorGUILayout.Slider(propNoiseAnimation, 0.0f, 10.0f, emptyLabel);
+        EditorGUILayout.LabelField("Turbulence");
+        EditorGUI.indentLevel++;
+        EditorGUILayout.Slider(propNoiseFrequency, 0.01f, 1.0f, textDensity);
+        EditorGUILayout.Slider(propNoiseSpeed, 0.0f, 50.0f, textStrength);
+        EditorGUILayout.Slider(propNoiseAnimation, 0.0f, 10.0f, textAnimation);
+        EditorGUI.indentLevel--;
 
         EditorGUILayout.Space();
 
