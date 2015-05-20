@@ -118,17 +118,26 @@ public class Stream : MonoBehaviour
 
     #endregion
 
-    #region Particle Buffers
+    #region Private Variables And Objects
 
     RenderTexture _particleBuffer1;
     RenderTexture _particleBuffer2;
+    Mesh _mesh;
+    bool _needsReset = true;
 
     #endregion
 
-    #region Private Variables And Objects
+    #region Private Properties
 
-    Mesh _mesh;
-    bool _needsReset = true;
+    int BufferWidth { get { return 256; } }
+
+    int BufferHeight {
+        get { return Mathf.Clamp(_maxParticles / BufferWidth + 1, 1, 127); }
+    }
+
+    static float deltaTime {
+        get { return Application.isPlaying ? Time.deltaTime : 1.0f / 30; }
+    }
 
     #endregion
 
@@ -137,12 +146,6 @@ public class Stream : MonoBehaviour
     public void NotifyConfigChange()
     {
         _needsReset = true;
-    }
-
-    int BufferWidth { get { return 256; } }
-
-    int BufferHeight {
-        get { return Mathf.Clamp(_maxParticles / BufferWidth + 1, 1, 127); }
     }
 
     Material CreateMaterial(Shader shader)
@@ -226,8 +229,7 @@ public class Stream : MonoBehaviour
         }
 
         var life = 2.0f;
-        var delta = Application.isPlaying ? Time.smoothDeltaTime : 1.0f / 30;
-        _kernelMaterial.SetVector("_Config", new Vector4(_throttle, life, _randomSeed, delta));
+        _kernelMaterial.SetVector("_Config", new Vector4(_throttle, life, _randomSeed, deltaTime));
     }
 
     void ResetResources()
@@ -247,11 +249,23 @@ public class Stream : MonoBehaviour
         if (!_lineMaterial)   _lineMaterial   = CreateMaterial(_lineShader);
         if (!_debugMaterial)  _debugMaterial  = CreateMaterial(_debugShader);
 
-        // Initialization.
+        // Warming up.
         ApplyKernelParameters();
-        Graphics.Blit(null, _particleBuffer2, _kernelMaterial, 0);
+        InitializeAndPrewarmBuffers();
 
         _needsReset = false;
+    }
+
+    void InitializeAndPrewarmBuffers()
+    {
+        // Initialization;
+        Graphics.Blit(null, _particleBuffer2, _kernelMaterial, 0);
+
+        // Apply the kernel shader repeatedly.
+        for (var i = 0; i < 8; i++) {
+            Graphics.Blit(_particleBuffer2, _particleBuffer1, _kernelMaterial, 1);
+            Graphics.Blit(_particleBuffer1, _particleBuffer2, _kernelMaterial, 1);
+        }
     }
 
     #endregion
@@ -275,6 +289,7 @@ public class Stream : MonoBehaviour
 
     void Update()
     {
+        //Time.captureFramerate = Random.Range(10, 60);
         if (_needsReset) ResetResources();
 
         ApplyKernelParameters();
@@ -291,21 +306,14 @@ public class Stream : MonoBehaviour
         }
         else
         {
-            // Editor: initialize the buffer on every update.
-            Graphics.Blit(null, _particleBuffer2, _kernelMaterial, 0);
-
-            // Apply the kernel shader repeatedly.
-            for (var i = 0; i < 10; i++) {
-                Graphics.Blit(_particleBuffer2, _particleBuffer1, _kernelMaterial, 1);
-                Graphics.Blit(_particleBuffer1, _particleBuffer2, _kernelMaterial, 1);
-            }
+            InitializeAndPrewarmBuffers();
         }
 
         // Draw particles.
         _lineMaterial.SetTexture("_ParticleTex1", _particleBuffer1);
         _lineMaterial.SetTexture("_ParticleTex2", _particleBuffer2);
         _lineMaterial.SetColor("_Color", _color);
-        _lineMaterial.SetFloat("_Tail", _tail);
+        _lineMaterial.SetFloat("_Tail", _tail / deltaTime / 60);
         Graphics.DrawMesh(_mesh, transform.position, transform.rotation, _lineMaterial, 0);
     }
 
