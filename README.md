@@ -14,7 +14,7 @@ Compatibility
 -------------
 
 KvantStream needs a 4-component floating-point texture format. Basically, it
-means it runs only on desktop GPUs.
+means it runs only on desktop/laptop-class GPUs.
 
 License
 -------
