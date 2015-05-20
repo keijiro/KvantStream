@@ -326,6 +326,12 @@ namespace Kvant
             }
         }
 
+        void OnDrawGizmosSelected()
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireCube(_emitterPosition, _emitterSize);
+        }
+
         #endregion
     }
 }
