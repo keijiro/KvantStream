@@ -1,5 +1,5 @@
 ﻿//
-// Line shader for Stream.
+// Line shader for Stream
 //
 // Vertex format:
 // position.x  = texture switch (0/1)
@@ -49,8 +49,8 @@ Shader "Hidden/Kvant/Stream/Line"
 
         float2 uv = v.texcoord.xy + _ParticleTex1_TexelSize.xy / 2;
 
-        float4 p1 = tex2D(_ParticleTex1, uv);
-        float4 p2 = tex2D(_ParticleTex2, uv);
+        float4 p1 = tex2Dlod(_ParticleTex1, float4(uv, 0, 0));
+        float4 p2 = tex2Dlod(_ParticleTex2, float4(uv, 0, 0));
         float sw = v.position.x;
 
         if (p1.w < 0)

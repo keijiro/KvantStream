@@ -1,5 +1,5 @@
 ﻿//
-// GPGPU kernels for Stream.
+// GPGPU kernels for Stream
 //
 // MainTex format:
 // .xyz = particle position
@@ -48,7 +48,7 @@ Shader "Hidden/Kvant/Stream/Kernel"
 
         // Random position.
         float3 p = float3(nrand(uv, t + 1), nrand(uv, t + 2), nrand(uv, t + 3));
-        p = (p - float3(0.5)) * _EmitterSize + _EmitterPos;
+        p = (p - (float3)0.5) * _EmitterSize + _EmitterPos;
 
         // Life duration.
         float l = _Config.y * (0.5 + nrand(uv, t + 0));
@@ -64,7 +64,7 @@ Shader "Hidden/Kvant/Stream/Kernel"
     {
         // Random vector.
         float3 v = float3(nrand(uv, 4), nrand(uv, 5), nrand(uv, 6));
-        v = (v - float3(0.5)) * 2;
+        v = (v - (float3)0.5) * 2;
 
         // Apply the spread parameter.
         v = lerp(_Direction.xyz, v, _Direction.w);
