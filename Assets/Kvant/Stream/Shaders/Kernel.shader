@@ -1,7 +1,7 @@
 ﻿//
 // GPGPU kernels for Stream
 //
-// MainTex format:
+// Texture format:
 // .xyz = particle position
 // .w   = particle life
 //
@@ -14,7 +14,7 @@ Shader "Hidden/Kvant/Stream/Kernel"
         _EmitterSize ("-", Vector) = (40, 40, 40, 0)
         _Direction   ("-", Vector) = (0, 0, -1, 0.2)
         _SpeedParams ("-", Vector) = (5, 10, 0, 0)
-        _NoiseParams ("-", Vector) = (0.2, 0.1, 1)  // (frequency, speed, animation)
+        _NoiseParams ("-", Vector) = (0.2, 0.1, 1)  // (frequency, amplitude, animation)
         _Config      ("-", Vector) = (1, 2, 0, 0)   // (throttle, life, random seed, dT)
     }
 

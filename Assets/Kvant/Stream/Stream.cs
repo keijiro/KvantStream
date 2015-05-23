@@ -24,7 +24,7 @@ namespace Kvant
         [SerializeField] float _maxSpeed = 10.0f;
 
         [SerializeField] float _noiseFrequency = 0.2f;
-        [SerializeField] float _noiseSpeed = 0.1f;
+        [SerializeField] float _noiseAmplitude = 0.1f;
         [SerializeField] float _noiseAnimation = 1.0f;
 
         [ColorUsage(true, true, 0, 8, 0.125f, 3)]
@@ -83,9 +83,9 @@ namespace Kvant
             set { _noiseFrequency = value; }
         }
 
-        public float noiseSpeed {
-            get { return _noiseSpeed; }
-            set { _noiseSpeed = value; }
+        public float noiseAmplitude {
+            get { return _noiseAmplitude; }
+            set { _noiseAmplitude = value; }
         }
 
         public float noiseAnimation {
@@ -216,9 +216,9 @@ namespace Kvant
 
             _kernelMaterial.SetVector("_SpeedParams", new Vector2(_minSpeed, _maxSpeed));
 
-            if (_noiseSpeed > 0)
+            if (_noiseAmplitude > 0)
             {
-                var np = new Vector3(_noiseFrequency, _noiseSpeed, _noiseAnimation);
+                var np = new Vector3(_noiseFrequency, _noiseAmplitude, _noiseAnimation);
                 _kernelMaterial.SetVector("_NoiseParams", np);
                 _kernelMaterial.EnableKeyword("NOISE_ON");
             }
@@ -288,7 +288,6 @@ namespace Kvant
 
         void Update()
         {
-            //Time.captureFramerate = Random.Range(10, 60);
             if (_needsReset) ResetResources();
 
             ApplyKernelParameters();
@@ -318,8 +317,10 @@ namespace Kvant
 
         void OnGUI()
         {
-            if (_debug && Event.current.type.Equals(EventType.Repaint)) {
-                if (_debugMaterial && _particleBuffer2) {
+            if (_debug && Event.current.type.Equals(EventType.Repaint))
+            {
+                if (_debugMaterial && _particleBuffer2)
+                {
                     var rect = new Rect(0, 0, 256, 64);
                     Graphics.DrawTexture(rect, _particleBuffer2, _debugMaterial);
                 }

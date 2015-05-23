@@ -234,7 +234,7 @@ MonoBehaviour:
   _minSpeed: 13.02139
   _maxSpeed: 26.3101616
   _noiseFrequency: .104000002
-  _noiseSpeed: 11
+  _noiseAmplitude: 11
   _noiseAnimation: 2.42000008
   _color: {r: 1.52358079, g: 1.97518885, b: 2.09299994, a: 1}
   _tail: 1

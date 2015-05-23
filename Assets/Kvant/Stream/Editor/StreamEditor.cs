@@ -23,7 +23,7 @@ namespace Kvant
         SerializedProperty propMaxSpeed;
 
         SerializedProperty propNoiseFrequency;
-        SerializedProperty propNoiseSpeed;
+        SerializedProperty propNoiseAmplitude;
         SerializedProperty propNoiseAnimation;
 
         SerializedProperty propColor;
@@ -33,8 +33,8 @@ namespace Kvant
 
         GUIContent textCenter;
         GUIContent textSize;
-        GUIContent textDensity;
-        GUIContent textStrength;
+        GUIContent textFrequency;
+        GUIContent textAmplitude;
         GUIContent textAnimation;
 
         void OnEnable()
@@ -52,7 +52,7 @@ namespace Kvant
             propMaxSpeed        = serializedObject.FindProperty("_maxSpeed");
 
             propNoiseFrequency  = serializedObject.FindProperty("_noiseFrequency");
-            propNoiseSpeed      = serializedObject.FindProperty("_noiseSpeed");
+            propNoiseAmplitude  = serializedObject.FindProperty("_noiseAmplitude");
             propNoiseAnimation  = serializedObject.FindProperty("_noiseAnimation");
 
             propColor           = serializedObject.FindProperty("_color");
@@ -62,20 +62,20 @@ namespace Kvant
 
             textCenter    = new GUIContent("Center");
             textSize      = new GUIContent("Size");
-            textDensity   = new GUIContent("Density");
-            textStrength  = new GUIContent("Strength");
+            textFrequency = new GUIContent("Frequency");
+            textAmplitude = new GUIContent("Amplitude");
             textAnimation = new GUIContent("Animation");
         }
 
-        void MinMaxSlider(SerializedProperty propMin, SerializedProperty propMax, float minLimit, float maxLimit)
+        void MinMaxSlider(string label, SerializedProperty propMin, SerializedProperty propMax, float minLimit, float maxLimit, string format)
         {
             var min = propMin.floatValue;
             var max = propMax.floatValue;
 
             EditorGUI.BeginChangeCheck();
 
-            var label = new GUIContent("x(" + min.ToString("0.00") + " - " + max.ToString("0.00") + ")");
-            EditorGUILayout.MinMaxSlider(label, ref min, ref max, minLimit, maxLimit);
+            var text = new GUIContent(label + " (" + min.ToString(format) + "-" + max.ToString(format) + ")");
+            EditorGUILayout.MinMaxSlider(text, ref min, ref max, minLimit, maxLimit);
 
             if (EditorGUI.EndChangeCheck()) {
                 propMin.floatValue = min;
@@ -108,7 +108,7 @@ namespace Kvant
             EditorGUILayout.LabelField("Velocity");
             EditorGUI.indentLevel++;
             EditorGUILayout.PropertyField(propDirection);
-            MinMaxSlider(propMinSpeed, propMaxSpeed, 0.0f, 50.0f);
+            MinMaxSlider("Speed", propMinSpeed, propMaxSpeed, 0.0f, 50.0f, "0.0");
             EditorGUILayout.Slider(propSpread, 0.0f, 1.0f);
             EditorGUI.indentLevel--;
 
@@ -116,8 +116,8 @@ namespace Kvant
 
             EditorGUILayout.LabelField("Turbulence");
             EditorGUI.indentLevel++;
-            EditorGUILayout.Slider(propNoiseFrequency, 0.01f, 1.0f, textDensity);
-            EditorGUILayout.Slider(propNoiseSpeed, 0.0f, 50.0f, textStrength);
+            EditorGUILayout.Slider(propNoiseFrequency, 0.01f, 1.0f, textFrequency);
+            EditorGUILayout.Slider(propNoiseAmplitude, 0.0f, 50.0f, textAmplitude);
             EditorGUILayout.Slider(propNoiseAnimation, 0.0f, 10.0f, textAnimation);
             EditorGUI.indentLevel--;
 
