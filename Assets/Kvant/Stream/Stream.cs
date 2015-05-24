@@ -38,8 +38,8 @@ namespace Kvant
 
         #region Public Properties
 
-        // Returns the actual number of particles.
         public int maxParticles {
+            // Returns the actual number of particles.
             get { return BufferWidth * BufferHeight; }
         }
 
@@ -131,11 +131,15 @@ namespace Kvant
         int BufferWidth { get { return 256; } }
 
         int BufferHeight {
-            get { return Mathf.Clamp(_maxParticles / BufferWidth + 1, 1, 127); }
+            get {
+                return Mathf.Clamp(_maxParticles / BufferWidth + 1, 1, 127);
+            }
         }
 
         static float deltaTime {
-            get { return Application.isPlaying ? Time.deltaTime : 1.0f / 30; }
+            get {
+                return Application.isPlaying && Time.frameCount > 1 ? Time.deltaTime : 1.0f / 10;
+            }
         }
 
         #endregion
@@ -206,29 +210,31 @@ namespace Kvant
             return mesh;
         }
 
-        void ApplyKernelParameters()
+        void UpdateKernelShader()
         {
-            _kernelMaterial.SetVector("_EmitterPos", _emitterPosition);
-            _kernelMaterial.SetVector("_EmitterSize", _emitterSize);
+            var m = _kernelMaterial;
+
+            m.SetVector("_EmitterPos", _emitterPosition);
+            m.SetVector("_EmitterSize", _emitterSize);
 
             var dir = new Vector4(_direction.x, _direction.y, _direction.z, _spread);
-            _kernelMaterial.SetVector("_Direction", dir);
+            m.SetVector("_Direction", dir);
 
-            _kernelMaterial.SetVector("_SpeedParams", new Vector2(_minSpeed, _maxSpeed));
+            m.SetVector("_SpeedParams", new Vector2(_minSpeed, _maxSpeed));
 
             if (_noiseAmplitude > 0)
             {
                 var np = new Vector3(_noiseFrequency, _noiseAmplitude, _noiseAnimation);
-                _kernelMaterial.SetVector("_NoiseParams", np);
-                _kernelMaterial.EnableKeyword("NOISE_ON");
+                m.SetVector("_NoiseParams", np);
+                m.EnableKeyword("NOISE_ON");
             }
             else
             {
-                _kernelMaterial.DisableKeyword("NOISE_ON");
+                m.DisableKeyword("NOISE_ON");
             }
 
             var life = 2.0f;
-            _kernelMaterial.SetVector("_Config", new Vector4(_throttle, life, _randomSeed, deltaTime));
+            m.SetVector("_Config", new Vector4(_throttle, life, _randomSeed, deltaTime));
         }
 
         void ResetResources()
@@ -249,7 +255,7 @@ namespace Kvant
             if (!_debugMaterial)  _debugMaterial  = CreateMaterial(_debugShader);
 
             // Warming up.
-            ApplyKernelParameters();
+            UpdateKernelShader();
             InitializeAndPrewarmBuffers();
 
             _needsReset = false;
@@ -257,10 +263,10 @@ namespace Kvant
 
         void InitializeAndPrewarmBuffers()
         {
-            // Initialization;
+            // Initialization.
             Graphics.Blit(null, _particleBuffer2, _kernelMaterial, 0);
 
-            // Apply the kernel shader repeatedly.
+            // Execute the kernel shader repeatedly.
             for (var i = 0; i < 8; i++) {
                 Graphics.Blit(_particleBuffer2, _particleBuffer1, _kernelMaterial, 1);
                 Graphics.Blit(_particleBuffer1, _particleBuffer2, _kernelMaterial, 1);
@@ -290,7 +296,7 @@ namespace Kvant
         {
             if (_needsReset) ResetResources();
 
-            ApplyKernelParameters();
+            UpdateKernelShader();
 
             if (Application.isPlaying)
             {
@@ -299,7 +305,7 @@ namespace Kvant
                 _particleBuffer1 = _particleBuffer2;
                 _particleBuffer2 = temp;
 
-                // Apply the kernel shader.
+                // Execute the kernel shader.
                 Graphics.Blit(_particleBuffer1, _particleBuffer2, _kernelMaterial, 1);
             }
             else
