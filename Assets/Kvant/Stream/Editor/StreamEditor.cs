@@ -7,7 +7,7 @@ using UnityEditor;
 
 namespace Kvant
 {
-    [CustomEditor(typeof(Stream))]
+    [CustomEditor(typeof(Stream)), CanEditMultipleObjects]
     public class StreamEditor : Editor
     {
         SerializedProperty propMaxParticles;
