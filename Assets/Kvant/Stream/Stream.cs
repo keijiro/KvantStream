@@ -1,7 +1,6 @@
 ﻿//
 // Stream - line particle system
 //
-
 using UnityEngine;
 
 namespace Kvant
@@ -11,28 +10,50 @@ namespace Kvant
     {
         #region Parameters Exposed To Editor
 
-        [SerializeField] int _maxParticles = 32768;
+        [SerializeField]
+        int _maxParticles = 32768;
 
-        [SerializeField] Vector3 _emitterPosition = Vector3.forward * 20;
-        [SerializeField] Vector3 _emitterSize = Vector3.one * 40;
-        [SerializeField] float _throttle = 1.0f;
+        [SerializeField]
+        Vector3 _emitterPosition = Vector3.forward * 20;
 
-        [SerializeField] Vector3 _direction = -Vector3.forward;
-        [SerializeField] float _spread = 0.2f;
+        [SerializeField]
+        Vector3 _emitterSize = Vector3.one * 40;
 
-        [SerializeField] float _minSpeed = 5.0f;
-        [SerializeField] float _maxSpeed = 10.0f;
+        [SerializeField, Range(0, 1)]
+        float _throttle = 1.0f;
 
-        [SerializeField] float _noiseFrequency = 0.2f;
-        [SerializeField] float _noiseAmplitude = 0.1f;
-        [SerializeField] float _noiseAnimation = 1.0f;
+        [SerializeField]
+        Vector3 _direction = -Vector3.forward;
 
-        [ColorUsage(true, true, 0, 8, 0.125f, 3)]
-        [SerializeField] Color _color = Color.white;
+        [SerializeField]
+        float _minSpeed = 5.0f;
 
-        [SerializeField] float _tail = 1.0f;
-        [SerializeField] int _randomSeed = 0;
-        [SerializeField] bool _debug;
+        [SerializeField]
+        float _maxSpeed = 10.0f;
+
+        [SerializeField, Range(0, 1)]
+        float _spread = 0.2f;
+
+        [SerializeField]
+        float _noiseFrequency = 0.2f;
+
+        [SerializeField]
+        float _noiseAmplitude = 0.1f;
+
+        [SerializeField]
+        float _noiseAnimation = 1.0f;
+
+        [SerializeField, ColorUsage(true, true, 0, 8, 0.125f, 3)]
+        Color _color = Color.white;
+
+        [SerializeField]
+        float _tail = 1.0f;
+
+        [SerializeField]
+        int _randomSeed = 0;
+
+        [SerializeField]
+        bool _debug;
 
         #endregion
 
@@ -63,11 +84,6 @@ namespace Kvant
             set { _direction = value; }
         }
 
-        public float spread {
-            get { return _spread; }
-            set { _spread = value; }
-        }
-
         public float minSpeed {
             get { return _minSpeed; }
             set { _minSpeed = value; }
@@ -76,6 +92,11 @@ namespace Kvant
         public float maxSpeed {
             get { return _maxSpeed; }
             set { _maxSpeed = value; }
+        }
+
+        public float spread {
+            get { return _spread; }
+            set { _spread = value; }
         }
 
         public float noiseFrequency {
