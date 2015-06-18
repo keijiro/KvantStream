@@ -35,13 +35,13 @@ namespace Kvant
         float _spread = 0.2f;
 
         [SerializeField]
-        float _noiseFrequency = 0.2f;
-
-        [SerializeField]
         float _noiseAmplitude = 0.1f;
 
         [SerializeField]
-        float _noiseAnimation = 1.0f;
+        float _noiseFrequency = 0.2f;
+
+        [SerializeField]
+        float _noiseSpeed = 1.0f;
 
         [SerializeField, ColorUsage(true, true, 0, 8, 0.125f, 3)]
         Color _color = Color.white;
@@ -99,19 +99,19 @@ namespace Kvant
             set { _spread = value; }
         }
 
-        public float noiseFrequency {
-            get { return _noiseFrequency; }
-            set { _noiseFrequency = value; }
-        }
-
         public float noiseAmplitude {
             get { return _noiseAmplitude; }
             set { _noiseAmplitude = value; }
         }
 
-        public float noiseAnimation {
-            get { return _noiseAnimation; }
-            set { _noiseAnimation = value; }
+        public float noiseFrequency {
+            get { return _noiseFrequency; }
+            set { _noiseFrequency = value; }
+        }
+
+        public float noiseSpeed {
+            get { return _noiseSpeed; }
+            set { _noiseSpeed = value; }
         }
 
         public Color color {
@@ -245,7 +245,7 @@ namespace Kvant
 
             if (_noiseAmplitude > 0)
             {
-                var np = new Vector3(_noiseFrequency, _noiseAmplitude, _noiseAnimation);
+                var np = new Vector3(_noiseFrequency, _noiseAmplitude, _noiseSpeed);
                 m.SetVector("_NoiseParams", np);
                 m.EnableKeyword("NOISE_ON");
             }

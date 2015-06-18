@@ -19,9 +19,9 @@ namespace Kvant
         SerializedProperty _maxSpeed;
         SerializedProperty _spread;
 
-        SerializedProperty _noiseFrequency;
         SerializedProperty _noiseAmplitude;
-        SerializedProperty _noiseAnimation;
+        SerializedProperty _noiseFrequency;
+        SerializedProperty _noiseSpeed;
 
         SerializedProperty _color;
         SerializedProperty _tail;
@@ -31,9 +31,8 @@ namespace Kvant
         static GUIContent _textCenter    = new GUIContent("Center");
         static GUIContent _textSize      = new GUIContent("Size");
         static GUIContent _textSpeed     = new GUIContent("Speed");
-        static GUIContent _textFrequency = new GUIContent("Frequency");
         static GUIContent _textAmplitude = new GUIContent("Amplitude");
-        static GUIContent _textAnimation = new GUIContent("Animation");
+        static GUIContent _textFrequency = new GUIContent("Frequency");
 
         void OnEnable()
         {
@@ -47,9 +46,9 @@ namespace Kvant
             _maxSpeed  = serializedObject.FindProperty("_maxSpeed");
             _spread    = serializedObject.FindProperty("_spread");
 
-            _noiseFrequency = serializedObject.FindProperty("_noiseFrequency");
             _noiseAmplitude = serializedObject.FindProperty("_noiseAmplitude");
-            _noiseAnimation = serializedObject.FindProperty("_noiseAnimation");
+            _noiseFrequency = serializedObject.FindProperty("_noiseFrequency");
+            _noiseSpeed     = serializedObject.FindProperty("_noiseSpeed");
 
             _color      = serializedObject.FindProperty("_color");
             _tail       = serializedObject.FindProperty("_tail");
@@ -73,29 +72,23 @@ namespace Kvant
                 targetStream.NotifyConfigChange();
 
             EditorGUILayout.LabelField("Emitter", EditorStyles.boldLabel);
-            EditorGUI.indentLevel++;
             EditorGUILayout.PropertyField(_emitterPosition, _textCenter);
             EditorGUILayout.PropertyField(_emitterSize, _textSize);
             EditorGUILayout.PropertyField(_throttle);
-            EditorGUI.indentLevel--;
 
             EditorGUILayout.Space();
 
             EditorGUILayout.LabelField("Velocity", EditorStyles.boldLabel);
-            EditorGUI.indentLevel++;
             EditorGUILayout.PropertyField(_direction);
             MinMaxSlider(_textSpeed, _minSpeed, _maxSpeed, 0.0f, 50.0f);
             EditorGUILayout.PropertyField(_spread);
-            EditorGUI.indentLevel--;
 
             EditorGUILayout.Space();
 
             EditorGUILayout.LabelField("Turbulent Noise", EditorStyles.boldLabel);
-            EditorGUI.indentLevel++;
-            EditorGUILayout.Slider(_noiseFrequency, 0.01f, 1.0f, _textFrequency);
             EditorGUILayout.Slider(_noiseAmplitude, 0.0f, 50.0f, _textAmplitude);
-            EditorGUILayout.Slider(_noiseAnimation, 0.0f, 10.0f, _textAnimation);
-            EditorGUI.indentLevel--;
+            EditorGUILayout.Slider(_noiseFrequency, 0.01f, 1.0f, _textFrequency);
+            EditorGUILayout.Slider(_noiseSpeed, 0.0f, 10.0f, _textSpeed);
 
             EditorGUILayout.Space();
 
