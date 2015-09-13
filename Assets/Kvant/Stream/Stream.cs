@@ -202,8 +202,8 @@ namespace Kvant
             {
                 for (var y = 0; y < Ny; y++)
                 {
-                    VA[Ai + 0] = new Vector3(0, 0, 0);
-                    VA[Ai + 1] = new Vector3(1, 0, 0);
+                    VA[Ai + 0] = new Vector3(1, 0, 0);
+                    VA[Ai + 1] = new Vector3(0, 0, 0);
 
                     var u = (float)x / Nx;
                     var v = (float)y / Ny;

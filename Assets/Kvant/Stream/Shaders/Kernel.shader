@@ -54,7 +54,7 @@ Shader "Hidden/Kvant/Stream/Kernel"
         float l = _Config.y * (0.5 + nrand(uv, t + 0));
 
         // Throttling: discard particle emission by adding offset.
-        float4 offs = float4(1e10, 1e10, 1e10, -1e10) * (uv.x > _Config.x);
+        float4 offs = float4(1e8, 1e8, 1e8, -1e8) * (uv.x > _Config.x);
 
         return float4(p, l) + offs;
     }
