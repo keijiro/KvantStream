@@ -1,4 +1,4 @@
-﻿//
+//
 // Line shader for Stream
 //
 // Vertex format:

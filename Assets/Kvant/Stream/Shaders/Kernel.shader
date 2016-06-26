@@ -1,4 +1,4 @@
-﻿//
+//
 // GPGPU kernels for Stream
 //
 // Texture format:

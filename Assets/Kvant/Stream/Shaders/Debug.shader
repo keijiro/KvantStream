@@ -1,4 +1,4 @@
-﻿Shader "Hidden/Kvant/Stream/Debug Blit"
+Shader "Hidden/Kvant/Stream/Debug Blit"
 {
     Properties
     {

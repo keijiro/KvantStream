@@ -1,4 +1,4 @@
-﻿//
+//
 // Stream - line particle system
 //
 using UnityEngine;
