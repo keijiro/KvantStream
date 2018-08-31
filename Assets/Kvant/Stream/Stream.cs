@@ -339,7 +339,7 @@ namespace Kvant
             _lineMaterial.SetTexture("_ParticleTex2", _particleBuffer2);
             _lineMaterial.SetColor("_Color", _color);
             _lineMaterial.SetFloat("_Tail", _tail / deltaTime / 60);
-            Graphics.DrawMesh(_mesh, transform.position, transform.rotation, _lineMaterial, 0);
+            Graphics.DrawMesh(_mesh, transform.position, transform.rotation, _lineMaterial, gameObject.layer);
         }
 
         void OnGUI()
