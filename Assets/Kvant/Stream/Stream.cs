@@ -55,6 +55,9 @@ namespace Kvant
         [SerializeField]
         bool _debug;
 
+        [SerializeField]
+        float _radius = 1.0f;
+
         #endregion
 
         #region Public Properties
@@ -223,7 +226,7 @@ namespace Kvant
             mesh.vertices = VA;
             mesh.uv = TA;
             mesh.SetIndices(IA, MeshTopology.Lines, 0);
-            mesh.Optimize();
+            ;
 
             // Avoid being culled.
             mesh.bounds = new Bounds(Vector3.zero, Vector3.one * 1000);
@@ -235,6 +238,7 @@ namespace Kvant
         {
             var m = _kernelMaterial;
 
+            m.SetFloat("_Radius", _radius);
             m.SetVector("_EmitterPos", _emitterPosition);
             m.SetVector("_EmitterSize", _emitterSize);
 

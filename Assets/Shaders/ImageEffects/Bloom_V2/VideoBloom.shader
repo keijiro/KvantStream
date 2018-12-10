@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 Shader "Hidden/VideoBloom"
 {
 	Properties 
@@ -40,7 +42,7 @@ Shader "Hidden/VideoBloom"
 		v_blurCoords vertBlur(appdata_img v)
 		{
 			v_blurCoords o;
-			o.pos = mul (UNITY_MATRIX_MVP, v.vertex);
+			o.pos = UnityObjectToClipPos (v.vertex);
 			o.uv0 = v.texcoord;
 			o.uv1 = v.texcoord + _MainTex_TexelSize.xy * _Param0.xy;
 			o.uv2 = v.texcoord - _MainTex_TexelSize.xy * _Param0.xy;
@@ -67,7 +69,7 @@ Shader "Hidden/VideoBloom"
 		v2f vert(appdata_img v)
 		{
 			v2f o;
-			o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+			o.pos = UnityObjectToClipPos(v.vertex);
 			o.uv =  v.texcoord.xy;
 			return o;
 		}

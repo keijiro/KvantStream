@@ -27,6 +27,8 @@ namespace Kvant
         SerializedProperty _tail;
         SerializedProperty _randomSeed;
         SerializedProperty _debug;
+        SerializedProperty _kernelShader;
+        SerializedProperty _radius;
 
         static GUIContent _textCenter    = new GUIContent("Center");
         static GUIContent _textSize      = new GUIContent("Size");
@@ -45,6 +47,7 @@ namespace Kvant
             _minSpeed  = serializedObject.FindProperty("_minSpeed");
             _maxSpeed  = serializedObject.FindProperty("_maxSpeed");
             _spread    = serializedObject.FindProperty("_spread");
+            _radius = serializedObject.FindProperty("_radius");
 
             _noiseAmplitude = serializedObject.FindProperty("_noiseAmplitude");
             _noiseFrequency = serializedObject.FindProperty("_noiseFrequency");
@@ -54,6 +57,8 @@ namespace Kvant
             _tail       = serializedObject.FindProperty("_tail");
             _randomSeed = serializedObject.FindProperty("_randomSeed");
             _debug      = serializedObject.FindProperty("_debug");
+            _kernelShader = serializedObject.FindProperty("_kernelShader");
+       
         }
 
         public override void OnInspectorGUI()
@@ -78,10 +83,11 @@ namespace Kvant
 
             EditorGUILayout.Space();
 
-            EditorGUILayout.LabelField("Velocity", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Physics", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(_direction);
             MinMaxSlider(_textSpeed, _minSpeed, _maxSpeed, 0.0f, 50.0f);
             EditorGUILayout.PropertyField(_spread);
+            EditorGUILayout.PropertyField(_radius);
 
             EditorGUILayout.Space();
 
@@ -96,6 +102,7 @@ namespace Kvant
             EditorGUILayout.Slider(_tail, 0.0f, 20.0f);
             EditorGUILayout.PropertyField(_randomSeed);
             EditorGUILayout.PropertyField(_debug);
+            EditorGUILayout.PropertyField(_kernelShader);
 
             serializedObject.ApplyModifiedProperties();
         }

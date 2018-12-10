@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 //
 // Line shader for Stream
 //
@@ -55,12 +57,12 @@ Shader "Hidden/Kvant/Stream/Line"
 
         if (p1.w < 0)
         {
-            o.position = mul(UNITY_MATRIX_MVP, float4(p2.xyz, 1));
+            o.position = UnityObjectToClipPos(float4(p2.xyz, 1));
         }
         else
         {
             float3 p = lerp(p2.xyz, p1.xyz, (1.0 - sw) * _Tail);
-            o.position = mul(UNITY_MATRIX_MVP, float4(p, 1));
+            o.position = UnityObjectToClipPos(float4(p, 1));
         }
 
         o.color = _Color;
