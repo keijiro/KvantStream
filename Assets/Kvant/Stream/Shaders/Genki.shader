@@ -20,6 +20,7 @@ Shader "Hidden/Kvant/Stream/Genki"
         _MousePosition("-", Vector) = (0, 0, 0, 0)
         _MouseShift("-", Vector) = (0, 0, 0, 0)
         _IsGatheringEnergy("-", Float) = 0
+        _IsReleasingEnergy("-", Float) = 0
     }
 
         CGINCLUDE
@@ -41,6 +42,7 @@ Shader "Hidden/Kvant/Stream/Genki"
     float3 _MousePosition;
     float3 _MouseShift;
     float _IsGatheringEnergy;
+    float _IsReleasingEnergy;
 
     // PRNG function.
     float nrand(float2 uv, float salt)
@@ -76,11 +78,11 @@ Shader "Hidden/Kvant/Stream/Genki"
         // Apply the spread parameter.
         v = lerp(_Direction.xyz, v, _Direction.w);
 
-        // Store the speed parameter.
-        float3 s = lerp(_SpeedParams.x, _SpeedParams.y, nrand(uv, 7));
-        float gatheringMultiplier = -45 * _IsGatheringEnergy + 50; 
-        float gatheringSpeed = min(s * gatheringMultiplier * _Radius, 100);
-
+        // Store various speed parameters.
+        float3 normalSpeed = lerp(_SpeedParams.x, _SpeedParams.y, nrand(uv, 7));
+        float gatheringSpeed = min(normalSpeed * 5 * _Radius, 50);
+        float releasingSpeed = min(normalSpeed * 20 * _Radius, 100);
+       
         if (_IsGatheringEnergy) {
             v = _MousePosition - p;
             // Apply speed parameter; particles closer to the mouse should move faster than particles farther away.
@@ -88,32 +90,33 @@ Shader "Hidden/Kvant/Stream/Genki"
             float farthestPoint = _MousePosition - _EmitterSize;
             float distanceRatio = (length(v) + _Radius) / (length(farthestPoint) + _Radius);
             v = normalize(v) * (1 - distanceRatio) *  gatheringSpeed;
+            if (distance(_MousePosition, p) < _Radius) {
+                // When the particle has come close enough to the ball, shift the velocity in a random direction that is tangent to
+                // its current velocity. Since the particle won't get any nearer to the center, repeated passes of this should have the
+                // particle move around the center in an erratic orbit.
+                float t = _Time.x;
+                float3 k = _MousePosition - p; // Defines a plane where any vector that lies within it will be tangent to the initial velocity vector.
+                float theta = nrand(uv, t) * 6.28;
+                v = cross(v, float3(1, 0, 0));  // Generate an arbitrary tangent (assumes that v will not be parallel to [1,0,0] with high probability)
+                // Rotate this tangent around the plane defined by k by an angle theta.
+                v = v * cos(theta) + cross(k, v) * sin(theta) + p * dot(k, v) * (1 - cos(theta));
+                return normalize(v) * gatheringSpeed;
+            }
         }
         else {
-            // Apply normal speed parameter.
-            v = normalize(v) * s;
+            if (distance(_MousePosition, p) < _Radius * 4 && _IsReleasingEnergy) v = normalize(v) * releasingSpeed;
+            else v = normalize(v) * normalSpeed;
         }
-
-        if (distance(_MousePosition, p) < _Radius) {
-            float t = _Time.x;
-            float3 k = _MousePosition - p;
-            float theta = nrand(uv, t) * 6.28;
-            v = cross(v, float3(1,0,0));
-            v = v * cos(theta) + cross(k, v) * sin(theta) + p * dot(k, v) * (1 - cos(theta));
-            return normalize(v) * gatheringSpeed;
-        }
-        else {
-            
 #ifdef NOISE_ON
-            // Add noise vector.
-            p = (p + _Time.y * _NoiseParams.z) * _NoiseParams.x;
-            float nx = cnoise(p + float3(138.2, 0, 0));
-            float ny = cnoise(p + float3(0, 138.2, 0));
-            float nz = cnoise(p + float3(0, 0, 138.2));
-            v += float3(nx, ny, nz) * _NoiseParams.y;
+        // Add noise vector.
+        p = (p + _Time.y * _NoiseParams.z) * _NoiseParams.x;
+        float nx = cnoise(p + float3(138.2, 0, 0));
+        float ny = cnoise(p + float3(0, 138.2, 0));
+        float nz = cnoise(p + float3(0, 0, 138.2));
+        v += float3(nx, ny, nz) * _NoiseParams.y;
 #endif
-            return v;
-        }
+        return v;
+
     }
 
     // Pass 0: Initialization
@@ -137,7 +140,7 @@ Shader "Hidden/Kvant/Stream/Genki"
             else {
                 // Else, this is a gathered particle, so refresh its life
                 p.w = _Config.y * (0.5 + nrand(i.uv, _Time.x));
-                // Adjust the location of this particle when the mouse moves while gathering energy
+                // Manually adjust the location of this particle when the mouse moves while gathering energy
                 p.xyz += _MouseShift;
             }
             return p;

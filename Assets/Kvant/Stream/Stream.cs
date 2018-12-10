@@ -153,6 +153,7 @@ namespace Kvant
         Vector3 _mousePosition = Vector3.zero;
         Vector3 _mouseShift = Vector3.zero;         // Track how much the mouse has moved in a single frame.
         bool _isGatheringEnergy = false;
+        float initialRadius = 0.0f;
 
         #endregion
 
@@ -243,6 +244,7 @@ namespace Kvant
         void UpdateKernelShader()
         {
             var m = _kernelMaterial;
+            bool isReleasingEnergy = !_isGatheringEnergy && _radius > initialRadius;
 
             m.SetFloat("_Radius", _radius);
             m.SetVector("_EmitterPos", _emitterPosition);
@@ -250,6 +252,7 @@ namespace Kvant
             m.SetVector("_MousePosition", _mousePosition);
             m.SetVector("_MouseShift", _mouseShift);
             m.SetFloat("_IsGatheringEnergy", _isGatheringEnergy ? 1 : 0);
+            m.SetFloat("_IsReleasingEnergy", isReleasingEnergy ? 1 : 0);
 
             var dir = new Vector4(_direction.x, _direction.y, _direction.z, _spread);
             m.SetVector("_Direction", dir);
@@ -308,18 +311,25 @@ namespace Kvant
         }
 
         void UpdateInput() {
+            if (Input.GetMouseButtonDown(0)) {
+                Debug.Log("Lend me your energy!");
+                _radius = initialRadius; // Reset radius when gathering for a new ball.
+            }
             if (Input.GetMouseButton(0)) {
+                // Convert the mouse's screen position to a 3D point based on the camera's position.
                 Vector3 p = transform.position;
                 Ray r = Camera.main.ScreenPointToRay(Input.mousePosition);
                 Vector3 newMousePosition = r.GetPoint(20);
                 _mouseShift = newMousePosition - _mousePosition;
                 _mousePosition = newMousePosition;
-                _isGatheringEnergy = true;
+                _isGatheringEnergy = true;                
                 _radius += _radiusGrowthRate * deltaTime;
-                Debug.Log(_mouseShift);
-            } else {
-                // _radius = Mathf.Max(_radius - _radiusGrowthRate * 4 * deltaTime, 1);
-                _radius = 1;
+            }
+            else if (Input.GetMouseButtonUp(0)) {
+                Debug.Log("Spirit Bomb!");
+            }
+            else {
+                _radius = Mathf.Max(_radius - _radiusGrowthRate * 4 * deltaTime, initialRadius);  
                 _isGatheringEnergy = false;
             }
         }
