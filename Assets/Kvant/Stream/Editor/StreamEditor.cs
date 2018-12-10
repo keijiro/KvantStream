@@ -29,6 +29,7 @@ namespace Kvant
         SerializedProperty _debug;
         SerializedProperty _kernelShader;
         SerializedProperty _radius;
+        SerializedProperty _radiusGrowthRate;
 
         static GUIContent _textCenter    = new GUIContent("Center");
         static GUIContent _textSize      = new GUIContent("Size");
@@ -48,6 +49,7 @@ namespace Kvant
             _maxSpeed  = serializedObject.FindProperty("_maxSpeed");
             _spread    = serializedObject.FindProperty("_spread");
             _radius = serializedObject.FindProperty("_radius");
+            _radiusGrowthRate = serializedObject.FindProperty("_radiusGrowthRate");
 
             _noiseAmplitude = serializedObject.FindProperty("_noiseAmplitude");
             _noiseFrequency = serializedObject.FindProperty("_noiseFrequency");
@@ -88,6 +90,7 @@ namespace Kvant
             MinMaxSlider(_textSpeed, _minSpeed, _maxSpeed, 0.0f, 50.0f);
             EditorGUILayout.PropertyField(_spread);
             EditorGUILayout.PropertyField(_radius);
+            EditorGUILayout.PropertyField(_radiusGrowthRate);
 
             EditorGUILayout.Space();
 

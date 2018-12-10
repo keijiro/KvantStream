@@ -58,6 +58,9 @@ namespace Kvant
         [SerializeField]
         float _radius = 1.0f;
 
+        [SerializeField]
+        float _radiusGrowthRate = .25f;
+
         #endregion
 
         #region Public Properties
@@ -147,6 +150,9 @@ namespace Kvant
         RenderTexture _particleBuffer2;
         Mesh _mesh;
         bool _needsReset = true;
+        Vector3 _mousePosition = Vector3.zero;
+        Vector3 _mouseShift = Vector3.zero;         // Track how much the mouse has moved in a single frame.
+        bool _isGatheringEnergy = false;
 
         #endregion
 
@@ -241,6 +247,9 @@ namespace Kvant
             m.SetFloat("_Radius", _radius);
             m.SetVector("_EmitterPos", _emitterPosition);
             m.SetVector("_EmitterSize", _emitterSize);
+            m.SetVector("_MousePosition", _mousePosition);
+            m.SetVector("_MouseShift", _mouseShift);
+            m.SetFloat("_IsGatheringEnergy", _isGatheringEnergy ? 1 : 0);
 
             var dir = new Vector4(_direction.x, _direction.y, _direction.z, _spread);
             m.SetVector("_Direction", dir);
@@ -298,6 +307,23 @@ namespace Kvant
             }
         }
 
+        void UpdateInput() {
+            if (Input.GetMouseButton(0)) {
+                Vector3 p = transform.position;
+                Ray r = Camera.main.ScreenPointToRay(Input.mousePosition);
+                Vector3 newMousePosition = r.GetPoint(20);
+                _mouseShift = newMousePosition - _mousePosition;
+                _mousePosition = newMousePosition;
+                _isGatheringEnergy = true;
+                _radius += _radiusGrowthRate * deltaTime;
+                Debug.Log(_mouseShift);
+            } else {
+                // _radius = Mathf.Max(_radius - _radiusGrowthRate * 4 * deltaTime, 1);
+                _radius = 1;
+                _isGatheringEnergy = false;
+            }
+        }
+
         #endregion
 
         #region MonoBehaviour Functions
@@ -322,6 +348,7 @@ namespace Kvant
             if (_needsReset) ResetResources();
 
             UpdateKernelShader();
+            UpdateInput();
 
             if (Application.isPlaying)
             {

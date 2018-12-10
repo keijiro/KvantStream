@@ -17,6 +17,9 @@ Shader "Hidden/Kvant/Stream/Genki"
         _NoiseParams("-", Vector) = (0.2, 0.1, 1)  // (frequency, amplitude, animation)
         _Config("-", Vector) = (1, 2, 0, 0)   // (throttle, life, random seed, dT)
         _Radius("-", Float) = 5
+        _MousePosition("-", Vector) = (0, 0, 0, 0)
+        _MouseShift("-", Vector) = (0, 0, 0, 0)
+        _IsGatheringEnergy("-", Float) = 0
     }
 
         CGINCLUDE
@@ -35,6 +38,9 @@ Shader "Hidden/Kvant/Stream/Genki"
     float4 _NoiseParams;
     float4 _Config;
     float _Radius;
+    float3 _MousePosition;
+    float3 _MouseShift;
+    float _IsGatheringEnergy;
 
     // PRNG function.
     float nrand(float2 uv, float salt)
@@ -64,26 +70,40 @@ Shader "Hidden/Kvant/Stream/Genki"
     // Position dependent velocity field.
     float3 get_velocity(float3 p, float2 uv)
     {
-        //// Random vector.
-        //float3 v = float3(nrand(uv, 4), nrand(uv, 5), nrand(uv, 6));
-        //v = (v - (float3)0.5) * 2;
+        float3 v = float3(nrand(uv, 4), nrand(uv, 5), nrand(uv, 6));
+        v = (v - (float3)0.5) * 2;
 
-        //// Apply the spread parameter.
-        //v = lerp(_Direction.xyz, v, _Direction.w);
+        // Apply the spread parameter.
+        v = lerp(_Direction.xyz, v, _Direction.w);
 
-        //// Apply the speed parameter.
-        //v = normalize(v) * lerp(_SpeedParams.x, _SpeedParams.y, nrand(uv, 7));
-
-        float3 v = -p;
+        // Store the speed parameter.
         float3 s = lerp(_SpeedParams.x, _SpeedParams.y, nrand(uv, 7));
-        v = normalize(v) * s;
-        if (length(p) < _Radius) {
-            float theta = nrand(uv, _Time.x) * 6.28;
-            v = cross(v, float3(1,0,0));
-            v = v * cos(theta) + cross(p, v) * sin(theta) + p * dot(p, v) * (1 - cos(theta));
-            return normalize(v) * s;
+        float gatheringMultiplier = -45 * _IsGatheringEnergy + 50; 
+        float gatheringSpeed = min(s * gatheringMultiplier * _Radius, 100);
+
+        if (_IsGatheringEnergy) {
+            v = _MousePosition - p;
+            // Apply speed parameter; particles closer to the mouse should move faster than particles farther away.
+            // Also the larger the ball, the faster particles should be attracted to it.
+            float farthestPoint = _MousePosition - _EmitterSize;
+            float distanceRatio = (length(v) + _Radius) / (length(farthestPoint) + _Radius);
+            v = normalize(v) * (1 - distanceRatio) *  gatheringSpeed;
         }
         else {
+            // Apply normal speed parameter.
+            v = normalize(v) * s;
+        }
+
+        if (distance(_MousePosition, p) < _Radius) {
+            float t = _Time.x;
+            float3 k = _MousePosition - p;
+            float theta = nrand(uv, t) * 6.28;
+            v = cross(v, float3(1,0,0));
+            v = v * cos(theta) + cross(k, v) * sin(theta) + p * dot(k, v) * (1 - cos(theta));
+            return normalize(v) * gatheringSpeed;
+        }
+        else {
+            
 #ifdef NOISE_ON
             // Add noise vector.
             p = (p + _Time.y * _NoiseParams.z) * _NoiseParams.x;
@@ -110,7 +130,16 @@ Shader "Hidden/Kvant/Stream/Genki"
         {
             float dt = _Config.w;
             p.xyz += get_velocity(p.xyz, i.uv) * dt; // position
-            if (length(p.xyz) > _Radius * 2) p.w -= dt;      // life
+            if (distance(_MousePosition, p.xyz) > _Radius * _IsGatheringEnergy) {
+                // If a normal particle, decrement current life
+                p.w -= dt;
+            }
+            else {
+                // Else, this is a gathered particle, so refresh its life
+                p.w = _Config.y * (0.5 + nrand(i.uv, _Time.x));
+                // Adjust the location of this particle when the mouse moves while gathering energy
+                p.xyz += _MouseShift;
+            }
             return p;
         }
         else
